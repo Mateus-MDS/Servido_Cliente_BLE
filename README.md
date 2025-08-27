@@ -1,0 +1,1 @@
+Dispositivo BLE, "central", procura por dispositivos periféricos próximos e detecta o anúncio. O dispositivo central se conecta ao dispositivo periférico, e troca dados por meio de características (attributes) definidas no perfil do dispositivo.
