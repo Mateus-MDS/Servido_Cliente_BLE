@@ -16,14 +16,14 @@ include(pico_sdk_import.cmake)
 
 project(client C CXX ASM)
 
-include_directories( ${CMAKE_SOURCE_DIR}/lib) # Inclui os files .h na pasta lib
+include_directories( ${CMAKE_SOURCE_DIR}/Lib) # Inclui os files .h na pasta lib
 
 # Initialise the Raspberry Pi Pico SDK
 pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(client client.c lib/ssd1306.c)
+add_executable(client client.c Lib/ssd1306.c)
 
 
 pico_set_program_name(client "client")
@@ -56,4 +56,5 @@ target_link_libraries(client
         )
 
 pico_add_extra_outputs(client)
+
 
