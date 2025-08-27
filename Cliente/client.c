@@ -1,39 +1,39 @@
- #include <stdio.h>             // Biblioteca padrão para entrada/saída (printf, etc.)
- #include "btstack.h"           // Biblioteca padrão para funcionalidades do Raspberry Pi Pico (GPIO, timers, etc.)
- #include "pico/cyw43_arch.h"   // Biblioteca específica para a arquitetura CYW43 (Wi-Fi/Bluetooth no Pico W)
+ #include <stdio.h>             // Biblioteca padrÃ£o para entrada/saÃ­da (printf, etc.)
+ #include "btstack.h"           // Biblioteca padrÃ£o para funcionalidades do Raspberry Pi Pico (GPIO, timers, etc.)
+ #include "pico/cyw43_arch.h"   // Biblioteca especÃ­fica para a arquitetura CYW43 (Wi-Fi/Bluetooth no Pico W)
  #include "pico/stdlib.h"       // Biblioteca BTstack para funcionalidades Bluetooth
 
  #include "hardware/i2c.h"
 
- // Bibliotecas espec�ficas do projeto
+ // Bibliotecas específicas do projeto
 #include "ssd1306.h"      // Driver do display OLED
 #include "font.h"         // Fontes para o display
 
-// Configura��o I2C para Display OLED
+// Configuração I2C para Display OLED
 #define I2C_PORT_DISP i2c1            // I2C1 para display
 #define I2C_SDA_DISP 14               // Pino SDA do display
 #define I2C_SCL_DISP 15               // Pino SCL do display
-#define ENDERECO_DISP 0x3C            // Endere�o I2C do display SSD1306
+#define ENDERECO_DISP 0x3C            // Endereço I2C do display SSD1306
 
 float temp;
  
  #if 0
- #define DEBUG_LOG(...) printf(__VA_ARGS__) // Define macro para logs de depuração (desativado por padrão)
+ #define DEBUG_LOG(...) printf(__VA_ARGS__) // Define macro para logs de depuraÃ§Ã£o (desativado por padrÃ£o)
  #else
  #define DEBUG_LOG(...)
  #endif
  
- #define LED_QUICK_FLASH_DELAY_MS 100       // Atraso em ms para piscar rápido no LED
+ #define LED_QUICK_FLASH_DELAY_MS 100       // Atraso em ms para piscar rÃ¡pido no LED
  #define LED_SLOW_FLASH_DELAY_MS 1000       // Atraso em ms para piscar lento no LED
  
  typedef enum {
      TC_OFF,                                // Cliente desligado
      TC_IDLE,                               // Cliente ocioso
      TC_W4_SCAN_RESULT,                     // Aguardando resultado de varredura BLE
-     TC_W4_CONNECT,                         // Aguardando conexão com dispositivo
-     TC_W4_SERVICE_RESULT,                  // Aguardando descoberta de serviço
-     TC_W4_CHARACTERISTIC_RESULT,           // Aguardando descoberta de característica
-     TC_W4_ENABLE_NOTIFICATIONS_COMPLETE,   // Aguardando habilitação de notificações
+     TC_W4_CONNECT,                         // Aguardando conexÃ£o com dispositivo
+     TC_W4_SERVICE_RESULT,                  // Aguardando descoberta de serviÃ§o
+     TC_W4_CHARACTERISTIC_RESULT,           // Aguardando descoberta de caracterÃ­stica
+     TC_W4_ENABLE_NOTIFICATIONS_COMPLETE,   // Aguardando habilitaÃ§Ã£o de notificaÃ§Ãµes
      TC_W4_READY                            // Cliente pronto para processar dados
  } gc_state_t;
  
@@ -50,7 +50,7 @@ float temp;
  static gatt_client_notification_t notification_listener;
  static btstack_timer_source_t heartbeat;
  
-// Protótipo de funções
+// ProtÃ³tipo de funÃ§Ãµes
 static void client_start(void);
 static bool advertisement_report_contains_service(uint16_t service, uint8_t *advertisement_report);
 static void handle_gatt_client_event(uint8_t packet_type, uint16_t channel, uint8_t *packet, uint16_t size);
@@ -59,23 +59,23 @@ static void heartbeat_handler(struct btstack_timer_source *ts);
 
 int main() {
 
-    // Inicializa o sistema de entrada e saída padrão (printf, etc.)
+    // Inicializa o sistema de entrada e saÃ­da padrÃ£o (printf, etc.)
      stdio_init_all();
  
     // Inicializa a arquitetura CYW43 (Wi-Fi e Bluetooth)
      if (cyw43_arch_init()) {
-        // Caso a inicialização falhe, imprime mensagem de erro e encerra o programa
-         printf("Falha para inicializar o periférico cyw43_arch\n");
+        // Caso a inicializaÃ§Ã£o falhe, imprime mensagem de erro e encerra o programa
+         printf("Falha para inicializar o perifÃ©rico cyw43_arch\n");
          return -1;
      }
  
-    // Inicializa o protocolo L2CAP (canal lógico no Bluetooth)
+    // Inicializa o protocolo L2CAP (canal lÃ³gico no Bluetooth)
      l2cap_init();
 
      // Inicializa o Security Manager (SM) para BLE
      sm_init();
 
-     // Define as capacidades de entrada/saída como "sem entrada ou saída" (usado para emparelhamento BLE)
+     // Define as capacidades de entrada/saÃ­da como "sem entrada ou saÃ­da" (usado para emparelhamento BLE)
      sm_set_io_capabilities(IO_CAPABILITY_NO_INPUT_NO_OUTPUT);
  
      // Configura o servidor ATT (Attribute Protocol), mas sem callbacks (NULL)
@@ -84,7 +84,7 @@ int main() {
      // Inicializa o cliente GATT para interagir com dispositivos BLE
      gatt_client_init();
      
-     // Registra o callback para eventos HCI, associando a função hci_event_handler
+     // Registra o callback para eventos HCI, associando a funÃ§Ã£o hci_event_handler
      hci_event_callback_registration.callback = &hci_event_handler;
      hci_add_event_handler(&hci_event_callback_registration);
  
@@ -103,7 +103,7 @@ int main() {
      gpio_pull_up(I2C_SDA_DISP);
      gpio_pull_up(I2C_SCL_DISP);
 
-     // Configura��o e inicializa��o do display SSD1306
+     // Configuração e inicialização do display SSD1306
      ssd1306_t ssd;
      ssd1306_init(&ssd, WIDTH, HEIGHT, false, ENDERECO_DISP, I2C_PORT_DISP);
      ssd1306_config(&ssd);
@@ -142,7 +142,7 @@ int main() {
 
      printf("Conectado a %s\n", bd_addr_to_str(server_addr));
 
-     char Temp_string[20];   // espa�o suficiente
+     char Temp_string[20];   // espaço suficiente
 
      snprintf(Temp_string, sizeof(Temp_string), "Temp: %.2f C", temp/100);
 
@@ -162,7 +162,7 @@ int main() {
      return 0;
  }
 
- //------------------------------ Funções ---------------------------------------
+ //------------------------------ FunÃ§Ãµes ---------------------------------------
 
  static void client_start(void){
     DEBUG_LOG("Start scanning!\n");
